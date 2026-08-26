@@ -1,0 +1,57 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Local agent/editor metadata
+.agents/
+.codex/
+.vscode/
+.idea/
+.DS_Store
+
+# Environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+
+# Datasets and generated training layouts
+datasets/
+prepared/
+
+# Training runs, weights, and exported models
+runs/
+*.ckpt
+*.pth
+*.pt
+*.onnx
+*.engine
+*.safetensors
+
+# Media inputs/outputs
+*.mp4
+*.MP4
+*.mov
+*.MOV
+*.avi
+*.mkv
+*.webm
+
+# Archives, logs, and temporary files
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.log
+*.pid
+*.tmp
+*.part
