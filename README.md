@@ -9,6 +9,8 @@ buses/freight vehicles, and motorcycles in drone and elevated-camera imagery.
 
 ![RF-DETR vehicle tracking with corner boxes and estimated speed](assets/demo_corner_speed.jpg)
 
+[Watch or download the 1080p output demo](https://github.com/owaisasghar/aerial-vehicle-detection-rfdetr/releases/download/v1.0.0/output_youtube_corner_speed_estimated.mp4)
+
 ## Highlights
 
 - Fine-tuned RF-DETR Small detector for small aerial vehicles.
@@ -84,9 +86,12 @@ flowchart LR
 
 The unified COCO dataset combines:
 
-- VisDrone2019-DET train and validation
-- UAVDT community YOLO repack
-- DroneVehicle RGB train and validation
+- [VisDrone2019-DET](https://github.com/VisDrone/VisDrone-Dataset) train and
+  validation splits
+- [UAVDT](https://sites.google.com/view/daweidu/projects/uavdt), using a
+  community conversion with YOLO-format labels
+- [DroneVehicle](https://github.com/VisDrone/DroneVehicle) RGB train and
+  validation splits (infrared images are not used)
 
 | Split | Images | Boxes | Negative images |
 |---|---:|---:|---:|
@@ -113,6 +118,73 @@ positives.
 
 Raw and prepared datasets are not included in this repository. Review and
 follow each upstream dataset's terms before training or commercial use.
+
+### Download and arrange the source datasets
+
+Download each dataset from its linked project page. VisDrone and DroneVehicle
+provide their download links on GitHub; UAVDT provides access from its official
+benchmark page. The preparation script expects the extracted files in this
+layout:
+
+```text
+datasets/
+├── visdrone/raw/
+│   ├── VisDrone2019-DET-train/
+│   │   ├── images/
+│   │   └── annotations/
+│   └── VisDrone2019-DET-val/
+│       ├── images/
+│       └── annotations/
+├── uavdt/raw/UAVDT/
+│   ├── train/{images,labels}/
+│   ├── val/{images,labels}/
+│   └── test/{images,labels}/
+└── dronevehicle/raw/
+    ├── train/{trainimg,trainlabel}/
+    └── val/{valimg,vallabel}/
+```
+
+The UAVDT reader expects YOLO text annotations (`class cx cy width height`,
+normalized to the image size), not the benchmark's original annotation format.
+If using the original release, convert its annotations to this layout first.
+
+### How the training dataset is prepared
+
+`prepare_dataset_v2.py` performs the complete conversion:
+
+1. Reads VisDrone text annotations, UAVDT YOLO annotations, and DroneVehicle
+   XML/polygon annotations.
+2. Maps supported motor-vehicle categories into one COCO class named
+   `vehicle`. For VisDrone these are car, van, truck, bus, and motor; for
+   DroneVehicle they are car, truck, bus, van, and freight car.
+3. Removes DroneVehicle's 100-pixel white border, converts oriented polygons to
+   axis-aligned boxes, and clips every box to the image boundary.
+4. Rejects corrupt images, missing/bad annotations, and boxes smaller than two
+   pixels; valid images without vehicles are retained as negative examples.
+5. Removes byte-identical images and groups capture sequences plus
+   high-confidence perceptual matches before splitting, reducing leakage of
+   neighboring or duplicated frames across train, validation, and test data.
+6. Creates a deterministic 80/10/10 split with seed `42` and writes each split
+   in RF-DETR-compatible COCO format.
+
+From the repository root, prepare and verify the dataset with:
+
+```bash
+python -m pip install -r requirements.txt
+
+python prepare_dataset_v2.py \
+  --datasets datasets \
+  --output prepared/aerial_vehicle_rfdetr \
+  --seed 42
+
+python audit_dataset.py --dataset prepared/aerial_vehicle_rfdetr
+python validate_rfdetr_loader.py
+```
+
+The output directory must not already exist; this safeguard prevents an
+accidental partial overwrite. The audit validates images and annotations and
+reports possible cross-split visual matches for review. After it passes, start
+training with `python train_rfdetr.py`.
 
 ## Training configuration
 
@@ -171,8 +243,13 @@ Conda or robotics environment injects incompatible CUDA libraries, launch with
 ## Model checkpoint
 
 The best checkpoint is approximately 124 MB and exceeds GitHub's normal 100 MB
-file limit, so model weights are not committed. Download the private release
-asset when available, or copy the trained checkpoint to:
+file limit, so it is distributed as a GitHub Release asset instead of being
+committed to the repository:
+
+- [Download `checkpoint_best_total.pth`](https://github.com/owaisasghar/aerial-vehicle-detection-rfdetr/releases/download/v1.0.0/checkpoint_best_total.pth)
+- SHA-256: `b7d80101d36bce349a09e3ee2965bc99195eafcb73054dd552e4b486d909202e`
+
+Place the downloaded checkpoint at:
 
 ```text
 runs/rfdetr_small_aerial_vehicle/checkpoint_best_total.pth
@@ -233,8 +310,8 @@ After placing the upstream datasets beneath `datasets/`:
 
 ```bash
 source .venv/bin/activate
-python prepare_dataset_v2.py
-python audit_dataset.py
+python prepare_dataset_v2.py --output prepared/aerial_vehicle_rfdetr
+python audit_dataset.py --dataset prepared/aerial_vehicle_rfdetr
 python validate_rfdetr_loader.py
 
 env -u LD_LIBRARY_PATH python train_rfdetr.py
