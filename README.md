@@ -12,6 +12,7 @@ buses/freight vehicles, and motorcycles in drone and elevated-camera imagery.
 ![RF-DETR vehicle tracking with corner boxes and estimated speed](assets/demo_corner_speed.jpg)
 
 [Watch or download the 1080p output demo](https://github.com/owaisasghar/aerial-vehicle-detection-rfdetr/releases/download/v1.0.0/output_youtube_corner_speed_estimated.mp4)
+· [Additional tracking demo](https://github.com/owaisasghar/aerial-vehicle-detection-rfdetr/releases/download/v1.0.0/output_youtube_Mp6klx9oeZs_rfdetr_tracked.mp4)
 
 ## Highlights
 
