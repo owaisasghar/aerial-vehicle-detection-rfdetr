@@ -7,6 +7,8 @@ inference, ByteTrack, and OpenCV/FFmpeg video processing.
 The detector is trained as a single `vehicle` class covering cars, vans, trucks,
 buses/freight vehicles, and motorcycles in drone and elevated-camera imagery.
 
+[![Model on Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Model-uwaisasghar%2Faerial--vehicle--detection--rfdetr-yellow)](https://huggingface.co/uwaisasghar/aerial-vehicle-detection-rfdetr)
+
 ![RF-DETR vehicle tracking with corner boxes and estimated speed](assets/demo_corner_speed.jpg)
 
 [Watch or download the 1080p output demo](https://github.com/owaisasghar/aerial-vehicle-detection-rfdetr/releases/download/v1.0.0/output_youtube_corner_speed_estimated.mp4)
