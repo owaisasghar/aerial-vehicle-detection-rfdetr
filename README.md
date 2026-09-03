@@ -247,12 +247,21 @@ file limit, so it is distributed as a GitHub Release asset instead of being
 committed to the repository:
 
 - [Download `checkpoint_best_total.pth`](https://github.com/owaisasghar/aerial-vehicle-detection-rfdetr/releases/download/v1.0.0/checkpoint_best_total.pth)
+- [View the model card on Hugging Face](https://huggingface.co/uwaisasghar/aerial-vehicle-detection-rfdetr)
 - SHA-256: `b7d80101d36bce349a09e3ee2965bc99195eafcb73054dd552e4b486d909202e`
 
 Place the downloaded checkpoint at:
 
 ```text
 runs/rfdetr_small_aerial_vehicle/checkpoint_best_total.pth
+```
+
+Alternatively, download it directly with the Hugging Face CLI:
+
+```bash
+hf download uwaisasghar/aerial-vehicle-detection-rfdetr \
+  checkpoint_best_total.pth \
+  --local-dir runs/rfdetr_small_aerial_vehicle
 ```
 
 You may also pass any checkpoint path explicitly with `--weights`.
